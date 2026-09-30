@@ -53,8 +53,6 @@ if (isset($_POST['login'])) {
 
         } else {
 
-            // Login berhasil
-
             session_regenerate_id(true);
 
             $_SESSION['user_id'] = $user['id'];
@@ -75,15 +73,8 @@ if (isset($_POST['login'])) {
 <!DOCTYPE html>
 <html lang="id">
 
-</body>
-
-</html>
-
-<!DOCTYPE html>
-<html lang="id">
-
 <head>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <meta charset="UTF-8">
 
     <meta name="viewport"
@@ -94,62 +85,62 @@ if (isset($_POST['login'])) {
     <link rel="stylesheet"
           href="assets/css/style.css?v=2">
 
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>
 
 <body class="login-page">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+    <div class="card shadow border rounded">
+        <div class="card-body">
 
-    <div class="login-card">
+            <h1>Sistem Pelanggaran Siswa</h1>
 
-        <h1>
-            Sistem Pelanggaran Siswa
-        </h1>
+            <p>Silakan login untuk melanjutkan.</p>
 
-        <p>
-            Silakan login untuk melanjutkan.
-        </p>
+            <?php if ($error != ""): ?>
+                <p><?= htmlspecialchars($error); ?></p>
+            <?php endif; ?>
 
-        <form method="POST">
+            <form method="POST">
 
-            <div class="login-form-group">
+                <div class="login-form-group">
 
-                <label>
-                    Email
-                </label>
+                    <label for="email">Email</label>
 
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Masukkan email"
-                    required
-                >
+                    <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        placeholder="Masukkan email"
+                        required
+                    >
 
-            </div>
+                </div>
 
-            <div class="login-form-group">
+                <div class="login-form-group">
 
-                <label>
-                    Password
-                </label>
+                    <label for="password">Password</label>
 
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Masukkan password"
-                    required
-                >
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        placeholder="Masukkan password"
+                        autocomplete="new-password"
+                        required
+                    >
 
-            </div>
+                </div>
 
-            <button
-                type="submit"
-                name="login"
-                class="login-button"
-            >
-                Masuk
-            </button>
+                <button type="submit" name="login">
+                    Login
+                </button>
 
-        </form>
+            </form>
 
+        </div>
     </div>
 
 </body>

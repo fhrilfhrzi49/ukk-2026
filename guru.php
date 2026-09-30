@@ -2,12 +2,10 @@
 
 session_start();
 
-session_unset();
-session_destroy();
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    ?>
 
-?>
-
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -31,15 +29,15 @@ session_destroy();
         <div class="card-body p-5">
 
             <h2 class="fw-bold mb-3">
-                Logout Berhasil
+                Halaman Ini Tidak Dapat Dibuka
             </h2>
 
             <p class="text-secondary mb-4">
-                Anda telah berhasil keluar dari sistem.
+                Hanya Administrator Yang Dapat Mengakses Halaman Ini.
             </p>
 
-            <a href="login.php" class="btn btn-dark px-4">
-                Kembali ke Login
+            <a href="dashboard.php" class="btn btn-dark px-4">
+                Kembali ke Dashboard
             </a>
 
         </div>
@@ -47,6 +45,31 @@ session_destroy();
     </div>
 
 </div>
+
+</body>
+
+</html>
+    <?php
+    exit;
+}
+
+require_once "config/koneksi.php";
+
+?>
+
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Data Guru</title>
+</head>
+
+<body>
+
+<h1>Data Guru</h1>
 
 </body>
 
