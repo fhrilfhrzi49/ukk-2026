@@ -25,6 +25,7 @@ session_start();
     <div class="card shadow border-0 rounded-4 w-100" style="max-width: 800px;">
 
         <div class="card-body p-4 p-md-5 text-center">
+            
 
             <img
                 src="assets/img/profile.jpg"
@@ -95,6 +96,14 @@ session_start();
                 Kembali ke Dashboard
             </a>
 
+
+            <!-- COPYRIGHT -->
+            <footer class="mt-4 pt-3 border-top text-center text-secondary">
+        <small>
+            © 2026 Sistem Pelanggaran Siswa — Muhamad Fahril Fahrurozi
+        </small>
+    </footer>
+
         </div>
 
     </div>
@@ -102,5 +111,6 @@ session_start();
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$role = $_SESSION['role'] ?? '';
+$role =$_SESSION['role'] ?? '';
 
 if ($role !== 'admin') {
     ?>
@@ -66,6 +66,17 @@ if ($role !== 'admin') {
 }
 
 require_once "config/koneksi.php";
+
+// Deteksi nama tabel kategori pelanggaran yang tersedia di database
+$nama_tabel = '';
+$cek_tabel = mysqli_query($koneksi, "SHOW TABLES");
+while ($t = mysqli_fetch_array($cek_tabel)) {
+    $tabel =$t[0];
+    if (in_array($tabel, ['pelanggaran_kategori', 'kategori_pelanggaran', 'kategori'])) {
+        $nama_tabel =$tabel;
+        break;
+    }
+}
 
 ?>
 
@@ -216,6 +227,24 @@ require_once "config/koneksi.php";
 
                 </li>
 
+                <li class="nav-item mb-2">
+                    <a
+                        href="riwayat.php"
+                        class="nav-link text-white"
+                    >
+                        Riwayat
+                    </a>
+                </li>
+
+                <li class="nav-item mb-2">
+                    <a
+                        href="rekap_poin.php"
+                        class="nav-link text-white"
+                    >
+                        Rekap Poin
+                    </a>
+                </li>
+
 
                 <!-- ABOUT ME -->
                 <li class="nav-item mb-2">
@@ -272,9 +301,86 @@ require_once "config/koneksi.php";
                 Kategori Pelanggaran
             </h2>
 
-            <p class="text-secondary">
+            <p class="text-secondary mb-4">
                 Kelola kategori pelanggaran siswa.
             </p>
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title fw-bold m-0">Daftar Kategori Pelanggaran</h5>
+                        <a href="tambah_kategori_pelanggaran.php" class="btn btn-primary btn-sm px-3">
+                            + Tambah Kategori
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">No</th>
+                                    <th scope="col">Nama Kategori</th>
+                                    <th scope="col">Deskripsi</th>
+                                    <th scope="col">Status Aktif</th>
+                                    <th scope="col" class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $no = 1;
+                                $query = null;
+                                if ($nama_tabel) {
+                                    $query = mysqli_query($koneksi, "SELECT * FROM `$nama_tabel`");
+                                }
+                                
+                                if ($query && mysqli_num_rows($query) > 0) {
+                                    while ($row = mysqli_fetch_assoc($query)) {
+                                        $id_kat       =$row['id'] ?? 0;
+                                        $nama_kat     =$row['nama'] ?? ($row['nama_kategori'] ?? '-');$deskripsi    = $row['deskripsi'] ?? '-';$status_aktif = $row['status_aktif'] ?? 'Aktif';$badge_class = 'bg-secondary';
+                                        if ($status_aktif == 'Aktif') {$badge_class = 'bg-success';
+                                        } else if ($status_aktif == '1') {$badge_class = 'bg-success';
+                                        } else if ($status_aktif == 1) {$badge_class = 'bg-success';
+                                        }
+                                ?>
+                                        <tr>
+                                            <td><?= $no++; ?></td>
+                                            <td><?= htmlspecialchars($nama_kat); ?></td>
+                                            <td><?= htmlspecialchars($deskripsi); ?></td>
+                                            <td>
+                                                <span class="badge <?= $badge_class; ?>">
+                                                    <?= htmlspecialchars($status_aktif); ?>
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="edit_kategori_pelanggaran.php?id=<?= $id_kat; ?>" class="btn btn-warning btn-sm text-white">
+                                                    Edit
+                                                </a>
+                                                <a href="hapus_kategori_pelanggaran.php?id=<?= $id_kat; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus kategori pelanggaran ini?');">
+                                                    Hapus
+                                                </a>
+                                            </td>
+                                        </tr>
+                                <?php 
+                                    }
+                                } else { 
+                                ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center text-secondary py-4">
+                                            <?php if (!$nama_tabel): ?>
+                                                Tabel untuk kategori pelanggaran (misal: <code>pelanggaran_kategori</code>) belum ada di database Anda.
+                                            <?php else: ?>
+                                                Belum ada data kategori pelanggaran atau tabel kosong.
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
 
         </main>
 
@@ -282,6 +388,7 @@ require_once "config/koneksi.php";
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

@@ -3,7 +3,7 @@
 require_once "config/koneksi.php";
 
 $email = "guru@gmail.com";
-$password = "guru123";
+$password = "guru1";
 
 $hash = password_hash($password, PASSWORD_DEFAULT);
 
@@ -20,7 +20,7 @@ mysqli_stmt_bind_param($stmt, "ss", $hash, $email);
 if (mysqli_stmt_execute($stmt)) {
 
     if (mysqli_stmt_affected_rows($stmt) > 0) {
-        echo "Password guru berhasil diubah menjadi: guru123";
+        echo "Password guru berhasil diubah menjadi: guru1";
     } else {
         echo "Data guru tidak ditemukan.";
     }

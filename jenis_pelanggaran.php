@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$role = $_SESSION['role'] ?? '';
+$role =$_SESSION['role'] ?? '';
 
 if ($role !== 'admin') {
     ?>
@@ -66,6 +66,17 @@ if ($role !== 'admin') {
 }
 
 require_once "config/koneksi.php";
+
+// Deteksi nama tabel jenis pelanggaran yang tersedia di database
+$nama_tabel = '';
+$cek_tabel = mysqli_query($koneksi, "SHOW TABLES");
+while ($t = mysqli_fetch_array($cek_tabel)) {
+    $tabel =$t[0];
+    if (in_array($tabel, ['pelanggaran', 'jenis_pelanggaran'])) {
+        $nama_tabel =$tabel;
+        break;
+    }
+}
 
 ?>
 
@@ -216,6 +227,24 @@ require_once "config/koneksi.php";
 
                 </li>
 
+                <li class="nav-item mb-2">
+                    <a
+                        href="riwayat.php"
+                        class="nav-link text-white"
+                    >
+                        Riwayat
+                    </a>
+                </li>
+
+                <li class="nav-item mb-2">
+                    <a
+                        href="rekap_poin.php"
+                        class="nav-link text-white"
+                    >
+                        Rekap Poin
+                    </a>
+                </li>
+
 
                 <!-- ABOUT ME -->
                 <li class="nav-item mb-2">
@@ -272,9 +301,113 @@ require_once "config/koneksi.php";
                 Jenis Pelanggaran
             </h2>
 
-            <p class="text-secondary">
-                Kelola jenis pelanggaran siswa.
+            <p class="text-secondary mb-4">
+                Kelola jenis pelanggaran siswa beserta bobot poin.
             </p>
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title fw-bold m-0">Daftar Jenis Pelanggaran</h5>
+                        <a href="tambah_jenis_pelanggaran.php" class="btn btn-primary btn-sm px-3">
+                            + Tambah Jenis Pelanggaran
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">No</th>
+                                    <th scope="col">Kategori</th>
+                                    <th scope="col">Nama Pelanggaran</th>
+                                    <th scope="col">Poin</th>
+                                    <th scope="col">Status Aktif</th>
+                                    <th scope="col" class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $no = 1;
+                                $query = null;
+                                if ($nama_tabel) {
+                                    $query = mysqli_query($koneksi, "SELECT * FROM `$nama_tabel`");
+                                }
+                                
+                                if ($query && mysqli_num_rows($query) > 0) {
+                                    while ($row = mysqli_fetch_assoc($query)) {
+                                        $id_jp            =$row['id'] ?? 0;
+                                        $kategori_id      =$row['pelanggaran_kategori_id'] ?? ($row['kategori_id'] ?? 0);$nama_pelanggaran = $row['nama'] ?? ($row['nama_pelanggaran'] ?? '-');
+                                        $poin             =$row['poin'] ?? 0;
+                                        $status_aktif     =$row['status_aktif'] ?? 'Aktif';
+
+                                        // Ambil nama kategori
+                                        $nama_kategori = '-';
+                                        if ($kategori_id) {
+                                            $q_kat = mysqli_query($koneksi, "SELECT * FROM pelanggaran_kategori WHERE id = '$kategori_id'");
+                                            if (!$q_kat) {
+                                                $q_kat = mysqli_query($koneksi, "SELECT * FROM kategori_pelanggaran WHERE id = '$kategori_id'");
+                                            }
+                                            if ($q_kat &&$d_kat = mysqli_fetch_assoc($q_kat)) {$nama_kategori = $d_kat['nama'] ?? ($d_kat['nama_kategori'] ?? '-');
+                                            }
+                                        }
+
+                                        $badge_class = 'bg-secondary';$status_teks = 'Tidak Aktif';
+                                        
+                                        if ($status_aktif == 'Aktif') {
+                                            $badge_class = 'bg-success';$status_teks = 'Aktif';
+                                        } else {
+                                            if ($status_aktif == '1') {
+                                                $badge_class = 'bg-success';$status_teks = 'Aktif';
+                                            } else {
+                                                if ($status_aktif == 1) {
+                                                    $badge_class = 'bg-success';$status_teks = 'Aktif';
+                                                }
+                                            }
+                                        }
+                                ?>
+                                        <tr>
+                                            <td><?= $no++; ?></td>
+                                            <td><?= htmlspecialchars($nama_kategori); ?></td>
+                                            <td><?= htmlspecialchars($nama_pelanggaran); ?></td>
+                                            <td>
+                                                <span class="badge bg-danger"><?= htmlspecialchars($poin); ?> Poin</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge <?= $badge_class; ?>">
+                                                    <?= htmlspecialchars($status_teks); ?>
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="edit_jenis_pelanggaran.php?id=<?= $id_jp; ?>" class="btn btn-warning btn-sm text-white">
+                                                    Edit
+                                                </a>
+                                                <a href="hapus_jenis_pelanggaran.php?id=<?= $id_jp; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus jenis pelanggaran ini?');">
+                                                    Hapus
+                                                </a>
+                                            </td>
+                                        </tr>
+                                <?php 
+                                    }
+                                } else { 
+                                ?>
+                                    <tr>
+                                        <td colspan="6" class="text-center text-secondary py-4">
+                                            <?php if (!$nama_tabel): ?>
+                                                Tabel untuk jenis pelanggaran (misal: <code>pelanggaran</code>) belum ada di database Anda.
+                                            <?php else: ?>
+                                                Belum ada data jenis pelanggaran atau tabel kosong.
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
 
         </main>
 
@@ -282,6 +415,7 @@ require_once "config/koneksi.php";
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

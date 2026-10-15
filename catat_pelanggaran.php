@@ -9,7 +9,8 @@ if (!isset($_SESSION['user_id'])) {
 
 $role = $_SESSION['role'] ?? '';
 
-if ($role !== 'guru') {
+// Izinkan Guru, Wali Kelas, dan Admin untuk mengakses halaman ini
+if ($role !== 'guru' && $role !== 'wali_kelas' && $role !== 'admin') {
     ?>
     <!DOCTYPE html>
     <html lang="id">
@@ -42,7 +43,7 @@ if ($role !== 'guru') {
                 </h2>
 
                 <p class="text-secondary mb-4">
-                    Hanya Guru Yang Dapat Mengakses Halaman Ini.
+                    Hanya Guru, Wali Kelas, dan Administrator Yang Dapat Mengakses Halaman Ini.
                 </p>
 
                 <a
@@ -115,7 +116,7 @@ require_once "config/koneksi.php";
                 </li>
 
 
-                <!-- GURU -->
+                <!-- MENU GURU / WALI KELAS -->
 
                 <li class="nav-item mb-2">
 
@@ -139,7 +140,17 @@ require_once "config/koneksi.php";
 
                 </li>
 
-                
+                <?php if ($role === 'wali_kelas' || $role === 'admin'): ?>
+                <li class="nav-item mb-2">
+
+                    <a
+                        href="laporan.php"
+                        class="nav-link text-white"
+                    >
+                        Laporan
+                    </a>
+
+                </li>
 
                 <li class="nav-item mb-2">
 
@@ -162,6 +173,7 @@ require_once "config/koneksi.php";
                     </a>
 
                 </li>
+                <?php endif; ?>
 
 
                 <!-- ABOUT ME -->
@@ -219,9 +231,76 @@ require_once "config/koneksi.php";
                 Catat Pelanggaran
             </h2>
 
-            <p class="text-secondary">
+            <p class="text-secondary mb-4">
                 Catat pelanggaran siswa.
             </p>
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title fw-bold m-0">Daftar Catatan Pelanggaran</h5>
+                        <a href="tambah_catat_pelanggaran.php" class="btn btn-primary btn-sm px-3">
+                            + Tambah Catatan
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">No</th>
+                                    <th scope="col">Tanggal</th>
+                                    <th scope="col">Nama Siswa</th>
+                                    <th scope="col">Jenis Pelanggaran</th>
+                                    <th scope="col">Poin</th>
+                                    <th scope="col">Keterangan</th>
+                                    <th scope="col" class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $no = 1;
+                                $query_catat = mysqli_query($koneksi, "SELECT * FROM pelanggaran_siswa");
+                                if (!$query_catat) {
+                                    $query_catat = mysqli_query($koneksi, "SELECT * FROM siswa_pelanggaran");
+                                }
+                                
+                                if ($query_catat && mysqli_num_rows($query_catat) > 0) {
+                                    while ($row_c = mysqli_fetch_assoc($query_catat)) {
+                                        $id_catat         = $row_c['id'] ?? 0;
+                                        $tanggal          = $row_c['tanggal'] ?? ($row_c['created_at'] ?? '-');
+                                        $nama_siswa       = $row_c['nama_siswa'] ?? ($row_c['siswa'] ?? 'Siswa');
+                                        $nama_pelanggaran = $row_c['nama_pelanggaran'] ?? ($row_c['pelanggaran'] ?? '-');
+                                        $poin             = $row_c['poin'] ?? 0;
+                                        $keterangan       = $row_c['keterangan'] ?? '-';
+                                ?>
+                                        <tr>
+                                            <td><?= $no++; ?></td>
+                                            <td><?= htmlspecialchars(substr($tanggal, 0, 10)); ?></td>
+                                            <td><?= htmlspecialchars($nama_siswa); ?></td>
+                                            <td><?= htmlspecialchars($nama_pelanggaran); ?></td>
+                                            <td><span class="badge bg-danger"><?= htmlspecialchars($poin); ?> Poin</span></td>
+                                            <td><?= htmlspecialchars($keterangan); ?></td>
+                                            <td class="text-center">
+                                                <a href="edit_catat_pelanggaran.php?id=<?= $id_catat; ?>" class="btn btn-warning btn-sm text-white">Edit</a>
+                                                <a href="hapus_catat_pelanggaran.php?id=<?= $id_catat; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus catatan ini?');">Hapus</a>
+                                            </td>
+                                        </tr>
+                                <?php 
+                                    }
+                                } else { 
+                                ?>
+                                    <tr>
+                                        <td colspan="7" class="text-center text-secondary py-4">Belum ada data catatan pelanggaran.</td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
 
         </main>
 
@@ -229,6 +308,7 @@ require_once "config/koneksi.php";
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

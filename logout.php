@@ -44,6 +44,12 @@ session_destroy();
 
         </div>
 
+        <footer class="mt-4 pt-3 border-top text-center text-secondary">
+        <small>
+            © 2026 Sistem Pelanggaran Siswa — Muhamad Fahril Fahrurozi
+        </small>
+    </footer>
+
     </div>
 
 </div>
