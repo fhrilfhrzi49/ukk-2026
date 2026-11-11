@@ -1,0 +1,35 @@
+{GURU}
+asep@gmail.com
+asep1234
+
+arif@gmail.com
+arif1234
+
+
+{ADMIN}
+admin@gmail.com
+admina123
+
+
+{GURU SEBAGAI WALI KELAS}
+wawan@gmail.com	
+wawanmks
+
+ari@gmail.com
+tasik123
+
+
+{WALI KELAS}
+dinda@gmail.com
+tasik1234
+
+
+PERUBAHAN
+1. Riwayat
+2.laporan
+3. TINDAKAN
+4.CATAT PELANGGARAM
+5. CETAK LAPORAN
+6. RIWAYAT
+7. REKAP POIN
+
