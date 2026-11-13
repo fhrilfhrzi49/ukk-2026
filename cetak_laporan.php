@@ -21,6 +21,8 @@ $role = $_SESSION['role'] ?? '';
 $userId = (int) ($_SESSION['id'] ?? $_SESSION['user_id'] ?? 0);
 $guruId = (int) ($_SESSION['guru_id'] ?? 0);
 
+$nama_login = $_SESSION['nama'] ?? $_SESSION['name'] ?? $_SESSION['username'] ?? 'Pengguna';
+
 $sql = "
     SELECT
         cp.id,
@@ -222,6 +224,7 @@ $totalPoin = array_sum(
 </head>
 
 <body class="bg-light">
+    
 
 <div class="container bg-white p-4 p-md-5 my-4 shadow-sm">
 
@@ -238,10 +241,12 @@ $totalPoin = array_sum(
         <p class="mb-2">
             Sistem Informasi Tata Tertib
         </p>
+        
 
         <hr class="border border-dark border-2">
 
     </div>
+    
 
     <div class="row g-3 mb-3">
 
@@ -354,7 +359,10 @@ $totalPoin = array_sum(
             </p>
 
             <p class="mb-5">
-                Petugas
+                <h5 class="fw-bold mb-1">
+                    <?= htmlspecialchars((string) $nama_login, ENT_QUOTES); ?>
+                </h5>
+                    
             </p>
 
             <p class="fw-bold text-decoration-underline">

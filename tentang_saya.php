@@ -67,11 +67,7 @@ unset($_SESSION['pesan_sukses']);
                     </div>
                 </div>
 
-                <?php if ($isAdmin): ?>
-                    <a href="konfirmasi_password_tentang_saya.php" class="btn btn-primary rounded-3">
-                        <i class="bi bi-pencil-square me-1"></i> Edit Tentang Saya
-                    </a>
-                <?php endif; ?>
+                
             </div>
 
             <?php if ($pesanSukses !== ''): ?>

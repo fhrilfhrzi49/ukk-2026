@@ -293,7 +293,7 @@ $totalPoin = array_sum(array_map(fn($row) => (int) ($row['poin'] ?? 0), $laporan
                                     <th class="text-center">Poin</th>
                                     <th>Keterangan</th>
                                     <th>Dicatat Oleh</th>
-                                    <th class="text-center">Aksi</th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -321,8 +321,8 @@ $totalPoin = array_sum(array_map(fn($row) => (int) ($row['poin'] ?? 0), $laporan
                                         <td><?= h($row['keterangan'] ?? '-') ?></td>
                                         <td><?= h($row['dicatat_oleh'] ?? '-') ?></td>
                                         <td class="text-center">
-                                            <a href="detail_pelanggaran.php?id=<?= (int) $row['id'] ?>" class="btn btn-sm btn-outline-primary" title="Detail laporan">
-                                                <i class="bi bi-eye"></i>
+                                            <a href="?id=<?= (int) $row['id'] ?>" class="" title="">
+                                                
                                             </a>
                                         </td>
                                     </tr>

@@ -5,8 +5,28 @@ wajib_role(['admin', 'administrator']);
 require_once __DIR__ . '/includes/cek_session.php';
 require_once __DIR__ . '/config/koneksi.php';
 
+$query = mysqli_query($koneksi, "
+    SELECT
+        ks.id,
+        s.nis,
+        s.nama AS nama_siswa,
+        ta.nama AS tahun_ajaran,
+        k.nama AS nama_kelas,
+        k.tingkat,
+        k.jurusan,
+        ks.tanggal_mulai,
+        ks.tanggal_selesai,
+        ks.status_aktif
+    FROM t_kelas_siswa ks
+    JOIN t_siswa s ON ks.siswa_id = s.id
+    JOIN t_kelas k ON ks.kelas_id = k.id
+    JOIN t_tahun_ajaran ta ON ks.tahun_ajaran_id = ta.id
+    ORDER BY ks.id DESC
+");
+
 $hasil = mysqli_query($koneksi, "SELECT * FROM t_siswa ORDER BY nama ASC");
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
