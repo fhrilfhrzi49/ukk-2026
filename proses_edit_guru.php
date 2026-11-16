@@ -1,4 +1,8 @@
+
 <?php
+require_once __DIR__ . '/config/akses.php';
+wajib_role(['admin', 'administrator']);
+
 require_once __DIR__ . '/includes/cek_session.php';
 require_once __DIR__ . '/config/koneksi.php';
 
@@ -60,7 +64,9 @@ $user_id = trim($_POST['user_id'] ?? '');
 $password_baru = $_POST['password_baru'] ?? '';
 $konfirmasi_password = $_POST['konfirmasi_password'] ?? '';
 
-if (!$id || $id < 1) tampilkanError('ID Guru Tidak Valid', 'ID guru tidak valid.', 'kelola_guru.php');
+if (!$id || $id < 1) {
+    tampilkanError('ID Guru Tidak Valid', 'ID guru tidak valid.', 'kelola_guru.php');
+}
 
 if ($nip === '' || $nama === '' || $email === '') {
     tampilkanError('Data Belum Lengkap', 'NIP, nama, dan email wajib diisi.', 'edit_guru.php?id=' . $id);
@@ -133,68 +139,106 @@ if ($user_id !== '') {
 
 mysqli_begin_transaction($koneksi);
 
-if ($userIdInt === null) {
-    $stmt = mysqli_prepare($koneksi, "UPDATE t_guru SET nip = ?, nama = ?, email = ?, status_aktif = ?, user_id = NULL WHERE id = ?");
+try {
+    if ($userIdInt === null) {
+        $stmt = mysqli_prepare($koneksi, "
+            UPDATE t_guru
+            SET nip = ?, nama = ?, email = ?, status_aktif = ?, user_id = NULL
+            WHERE id = ?
+        ");
 
-    if ($stmt) {
+        if (!$stmt) {
+            throw new Exception('Pernyataan update guru gagal disiapkan.');
+        }
+
         mysqli_stmt_bind_param($stmt, 'sssii', $nip, $nama, $email, $status_aktif, $id);
-    }
-} else {
-    $stmt = mysqli_prepare($koneksi, "UPDATE t_guru SET nip = ?, nama = ?, email = ?, status_aktif = ?, user_id = ? WHERE id = ?");
 
-    if ($stmt) {
+    } else {
+        $stmt = mysqli_prepare($koneksi, "
+            UPDATE t_guru
+            SET nip = ?, nama = ?, email = ?, status_aktif = ?, user_id = ?
+            WHERE id = ?
+        ");
+
+        if (!$stmt) {
+            throw new Exception('Pernyataan update guru gagal disiapkan.');
+        }
+
         mysqli_stmt_bind_param($stmt, 'sssiii', $nip, $nama, $email, $status_aktif, $userIdInt, $id);
     }
-}
 
-if (!$stmt) {
-    mysqli_rollback($koneksi);
-    tampilkanError('Kesalahan Database', 'Pernyataan untuk memperbarui data guru gagal disiapkan.', 'edit_guru.php?id=' . $id);
-}
-
-if (!mysqli_stmt_execute($stmt)) {
-    $kodeError = mysqli_stmt_errno($stmt);
-    mysqli_stmt_close($stmt);
-    mysqli_rollback($koneksi);
-
-    if ($kodeError === 1062) {
-        tampilkanError('Data Sudah Digunakan', 'NIP, email, atau data unik lainnya sudah digunakan oleh data lain.', 'edit_guru.php?id=' . $id);
-    }
-
-    if ($kodeError === 1452) {
-        tampilkanError('Akun Pengguna Tidak Valid', 'User ID tidak tersedia atau tidak dapat ditautkan ke data guru.', 'edit_guru.php?id=' . $id);
-    }
-
-    tampilkanError('Gagal Memperbarui Data', 'Data guru gagal diperbarui. Periksa kembali data yang dimasukkan.', 'edit_guru.php?id=' . $id);
-}
-
-mysqli_stmt_close($stmt);
-
-if ($password_baru !== '') {
-    $password_hash = password_hash($password_baru, PASSWORD_DEFAULT);
-    $stmt = mysqli_prepare($koneksi, "UPDATE t_users SET password = ? WHERE id = ?");
-
-    if (!$stmt) {
-        mysqli_rollback($koneksi);
-        tampilkanError('Kesalahan Database', 'Pernyataan untuk mengubah password gagal disiapkan.', 'edit_guru.php?id=' . $id);
-    }
-
-    mysqli_stmt_bind_param($stmt, 'si', $password_hash, $userIdInt);
-
-    if (!mysqli_stmt_execute($stmt) || mysqli_stmt_affected_rows($stmt) < 0) {
+    if (!mysqli_stmt_execute($stmt)) {
+        $kodeError = mysqli_stmt_errno($stmt);
         mysqli_stmt_close($stmt);
-        mysqli_rollback($koneksi);
-        tampilkanError('Gagal Mengubah Password', 'Password akun guru gagal diperbarui.', 'edit_guru.php?id=' . $id);
+
+        if ($kodeError === 1062) {
+            throw new Exception('NIP, email, atau data unik lainnya sudah digunakan oleh data lain.');
+        }
+
+        if ($kodeError === 1452) {
+            throw new Exception('User ID tidak tersedia atau tidak dapat ditautkan ke data guru.');
+        }
+
+        throw new Exception('Data guru gagal diperbarui.');
     }
 
     mysqli_stmt_close($stmt);
-}
 
-if (!mysqli_commit($koneksi)) {
+    if ((int) $status_aktif === 0) {
+        $stmt = mysqli_prepare($koneksi, "
+            UPDATE t_wali_kelas
+            SET status_aktif = 0
+            WHERE guru_id = ?
+        ");
+
+        if (!$stmt) {
+            throw new Exception('Pernyataan penonaktifan wali kelas gagal disiapkan.');
+        }
+
+        mysqli_stmt_bind_param($stmt, 'i', $id);
+
+        if (!mysqli_stmt_execute($stmt)) {
+            throw new Exception('Penugasan wali kelas gagal dinonaktifkan.');
+        }
+
+        mysqli_stmt_close($stmt);
+    }
+
+    if ($password_baru !== '') {
+        $password_hash = password_hash($password_baru, PASSWORD_DEFAULT);
+
+        $stmt = mysqli_prepare($koneksi, "
+            UPDATE t_users
+            SET password = ?
+            WHERE id = ?
+        ");
+
+        if (!$stmt) {
+            throw new Exception('Pernyataan perubahan password gagal disiapkan.');
+        }
+
+        mysqli_stmt_bind_param($stmt, 'si', $password_hash, $userIdInt);
+
+        if (!mysqli_stmt_execute($stmt)) {
+            throw new Exception('Password akun guru gagal diperbarui.');
+        }
+
+        mysqli_stmt_close($stmt);
+    }
+
+    if (!mysqli_commit($koneksi)) {
+        throw new Exception('Perubahan data gagal disimpan.');
+    }
+
+    header('Location: kelola_guru.php');
+    exit;
+
+} catch (Throwable $e) {
     mysqli_rollback($koneksi);
-    tampilkanError('Gagal Menyimpan Data', 'Perubahan data guru gagal disimpan.', 'edit_guru.php?id=' . $id);
-}
 
-header('Location: kelola_guru.php');
-exit;
-?>
+    tampilkanError(
+        'Gagal Memperbarui Data',
+        $e->getMessage(),
+        'edit_guru.php?id=' . $id
+    );
+}

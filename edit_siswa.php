@@ -1,9 +1,19 @@
-<?php
-include 'includes/cek_session.php';
-include 'config/koneksi.php';
 
-$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-$stmt = mysqli_prepare($koneksi, "SELECT * FROM t_siswa WHERE id = ?");
+<?php
+require_once __DIR__ . '/config/akses.php';
+wajib_role(['admin', 'administrator']);
+
+require_once __DIR__ . '/includes/cek_session.php';
+require_once __DIR__ . '/config/koneksi.php';
+
+$id = (int) ($_GET['id'] ?? 0);
+
+$stmt = mysqli_prepare($koneksi, "
+    SELECT *
+    FROM t_siswa
+    WHERE id = ?
+");
+
 mysqli_stmt_bind_param($stmt, "i", $id);
 mysqli_stmt_execute($stmt);
 $data = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
@@ -45,22 +55,22 @@ if (!$data) {
 
                 <div class="card-body p-4">
                     <form action="proses_edit_siswa.php" method="POST">
-                        <input type="hidden" name="id" value="<?= htmlspecialchars($data['id']) ?>">
+                        <input type="hidden" name="id" value="<?= htmlspecialchars((string) $data['id'], ENT_QUOTES, 'UTF-8') ?>">
 
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
                                 <label for="nis" class="form-label">NIS</label>
-                                <input type="text" class="form-control" id="nis" name="nis" value="<?= htmlspecialchars($data['nis']) ?>" required>
+                                <input type="text" class="form-control" id="nis" name="nis" value="<?= htmlspecialchars((string) $data['nis'], ENT_QUOTES, 'UTF-8') ?>" required>
                             </div>
 
                             <div class="col-12 col-md-6">
                                 <label for="nisn" class="form-label">NISN</label>
-                                <input type="text" class="form-control" id="nisn" name="nisn" value="<?= htmlspecialchars($data['nisn']) ?>" required>
+                                <input type="text" class="form-control" id="nisn" name="nisn" value="<?= htmlspecialchars((string) $data['nisn'], ENT_QUOTES, 'UTF-8') ?>" required>
                             </div>
 
                             <div class="col-12">
                                 <label for="nama" class="form-label">Nama Siswa</label>
-                                <input type="text" class="form-control" id="nama" name="nama" value="<?= htmlspecialchars($data['nama']) ?>" required>
+                                <input type="text" class="form-control" id="nama" name="nama" value="<?= htmlspecialchars((string) $data['nama'], ENT_QUOTES, 'UTF-8') ?>" required>
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -73,12 +83,12 @@ if (!$data) {
 
                             <div class="col-12 col-md-6">
                                 <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                                <input type="date" class="form-control" id="tanggal_lahir" name="tanggal_lahir" value="<?= htmlspecialchars($data['tanggal_lahir']) ?>" required>
+                                <input type="date" class="form-control" id="tanggal_lahir" name="tanggal_lahir" value="<?= htmlspecialchars((string) $data['tanggal_lahir'], ENT_QUOTES, 'UTF-8') ?>" required>
                             </div>
 
                             <div class="col-12">
                                 <label for="alamat" class="form-label">Alamat</label>
-                                <textarea class="form-control" id="alamat" name="alamat" rows="4" required><?= htmlspecialchars($data['alamat']) ?></textarea>
+                                <textarea class="form-control" id="alamat" name="alamat" rows="4" required><?= htmlspecialchars((string) $data['alamat'], ENT_QUOTES, 'UTF-8') ?></textarea>
                             </div>
 
                             <div class="col-12">

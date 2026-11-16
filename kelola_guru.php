@@ -1,3 +1,4 @@
+
 <?php
 require_once __DIR__ . '/config/akses.php';
 wajib_role(['admin', 'administrator']);
@@ -5,7 +6,19 @@ wajib_role(['admin', 'administrator']);
 require_once __DIR__ . '/includes/cek_session.php';
 require_once __DIR__ . '/config/koneksi.php';
 
-$hasil = mysqli_query($koneksi, "SELECT id, nip, nama, email, status_aktif FROM t_guru ORDER BY nama ASC");
+mysqli_query($koneksi, "
+    UPDATE t_wali_kelas w
+    INNER JOIN t_guru g ON w.guru_id = g.id
+    SET w.status_aktif = 0
+    WHERE g.status_aktif = 0
+");
+
+$hasil = mysqli_query($koneksi, "
+    SELECT id, nip, nama, email, status_aktif
+    FROM t_guru
+    ORDER BY nama ASC
+");
+
 $errorDatabase = !$hasil;
 ?>
 

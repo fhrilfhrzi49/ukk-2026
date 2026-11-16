@@ -1,4 +1,3 @@
-
 <?php
 require_once __DIR__ . '/config/akses.php';
 
@@ -317,6 +316,7 @@ $totalPelanggaran = array_sum(array_column($daftarRekap, 'jumlah_pelanggaran'));
                                     <th>Total Poin</th>
                                     <th>Kategori</th>
                                     <th>Pelanggaran Terakhir</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -333,6 +333,16 @@ $totalPelanggaran = array_sum(array_column($daftarRekap, 'jumlah_pelanggaran'));
                                             </span>
                                         </td>
                                         <td><?= h($item['pelanggaran_terakhir'] ?? 'Belum ada') ?></td>
+                                        <td>
+                                            <?php if ((int) $item['total_poin'] > 50): ?>
+                                                <a href="surat_peringatan.php?siswa_id=<?= (int) $item['siswa_id'] ?>"
+                                                   class="btn btn-danger btn-sm">
+                                                    <i class="bi bi-printer"></i> Surat Peringatan
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="text-secondary">-</span>
+                                            <?php endif; ?>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -566,7 +576,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 infoFiltered: '(disaring dari _MAX_ data)'
             },
             columnDefs: [{
-                targets: 0,
+                targets: [0, 7],
                 orderable: false,
                 searchable: false
             }]

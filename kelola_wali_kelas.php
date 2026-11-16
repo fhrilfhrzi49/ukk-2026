@@ -1,9 +1,18 @@
+
 <?php
 require_once __DIR__ . '/config/akses.php';
 wajib_role(['admin']);
 
 require_once __DIR__ . '/includes/cek_session.php';
 require_once __DIR__ . '/config/koneksi.php';
+
+mysqli_query($koneksi, "
+    UPDATE t_wali_kelas w
+    INNER JOIN t_guru g ON w.guru_id = g.id
+    SET w.status_aktif = 0
+    WHERE g.status_aktif = 0
+      AND w.status_aktif = 1
+");
 
 $sql = "
     SELECT
